@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Avatar, Divider, Drawer, Icon, List, ListItemButton, ListItemIcon, ListItemText, useMediaQuery, useTheme } from '@mui/material';
+import { Avatar, Divider, Drawer,  List, useMediaQuery, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useDrawerContext } from '../../contexts';
+import { ListItemLink } from './ListMenu';
 
 interface MenuLateralProps {
   children: React.ReactNode;
@@ -10,8 +11,7 @@ interface MenuLateralProps {
 export const MenuLateral: React.FC<MenuLateralProps> = ({ children }) => {
   const theme = useTheme();
   const smDown = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const { isDrawerOpen, toggleDrawerOpen} = useDrawerContext();
+  const { isDrawerOpen, drawerOptions, toggleDrawerOpen } = useDrawerContext();
 
   return (
     <>
@@ -29,12 +29,15 @@ export const MenuLateral: React.FC<MenuLateralProps> = ({ children }) => {
 
           <Box flex={1}>
             <List component="nav">
-              <ListItemButton>
-                <ListItemIcon>
-                  <Icon>home</Icon>
-                </ListItemIcon>
-                <ListItemText primary="Página inicial" />
-              </ListItemButton>
+              {drawerOptions.map(drawerOption => (
+                <ListItemLink
+                  to={drawerOption.path}
+                  key={drawerOption.path}
+                  icon={drawerOption.icon}
+                  label={drawerOption.label}
+                  onClick={smDown ? toggleDrawerOpen : undefined}
+                />
+              ))}
             </List>
           </Box>
 
