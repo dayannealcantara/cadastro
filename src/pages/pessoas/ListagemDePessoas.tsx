@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { IListagemPessoa, PessoasService } from '../../shared/service/api/pessoas/PessoasService';
 import { useDebounce } from '../../shared/hooks';
 import { LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material';
+import { Environment } from '../../shared/environment';
 
 export const ListagemDePessoas: React.FC =() =>{
   const[searchParams, setSearchParams] = useSearchParams();
@@ -62,6 +63,9 @@ export const ListagemDePessoas: React.FC =() =>{
               </TableRow>
             ))}
           </TableBody>
+          {totalCount === 0 && !isLoading && (
+            <caption>{Environment.LISTAGEM_VAZIA}</caption>
+          )}
           <TableFooter>
             {isLoading && (
               <TableRow>
