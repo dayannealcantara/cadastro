@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { IListagemPessoa, PessoasService } from '../../shared/service/api/pessoas/PessoasService';
 import { useDebounce } from '../../shared/hooks';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material';
 
 export const ListagemDePessoas: React.FC =() =>{
   const[searchParams, setSearchParams] = useSearchParams();
@@ -62,6 +62,15 @@ export const ListagemDePessoas: React.FC =() =>{
               </TableRow>
             ))}
           </TableBody>
+          <TableFooter>
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <LinearProgress variant='indeterminate'/>
+                </TableCell>
+              </TableRow>          
+            )}
+          </TableFooter>
         </Table>
       </TableContainer>      
     </LayoutBaseDePagina>
