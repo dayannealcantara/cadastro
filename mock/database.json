@@ -1,12 +1,6 @@
 {
   "pessoas": [
     {
-      "id": 1,
-      "email": "Ana@.com.br",
-      "cidadeId": 1,
-      "nomeCompleto": "Ana Silva"
-    },
-    {
       "id": 2,
       "email": "Ana@.com.br",
       "cidadeId": 1,
@@ -17,12 +11,6 @@
       "email": "Ana@.com.br",
       "cidadeId": 1,
       "nomeCompleto": "João Santos"
-    },
-    {
-      "id": 4,
-      "email": "Ana@.com.br",
-      "cidadeId": 1,
-      "nomeCompleto": "Ana Silva"
     },
     {
       "id": 5,
