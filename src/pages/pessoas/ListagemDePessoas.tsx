@@ -67,8 +67,11 @@ export const ListagemDePessoas: React.FC =() =>{
   
 
   return(
-    <LayoutBaseDePagina titulo='Listagem de Pessoas' barraDeFerramentas={(<BarraDeFerramentas textoBtn='Nova' mostrarInputBusca
+    <LayoutBaseDePagina titulo='Listagem de Pessoas' barraDeFerramentas={(<BarraDeFerramentas      
+      mostrarInputBusca
       textoDaBusca={busca}
+      textoBtn='Nova' 
+      aoClicarBtn={()=>navigate('/pessoas/detalhe/nova')}
       aoMudarBusca={texto => setSearchParams({ busca: texto, pagina: '1' }, { replace: true })}
     />)}>
       <TableContainer component={Paper} variant='outlined' sx={{m:1, width:'auto'}}>
