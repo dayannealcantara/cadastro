@@ -3,6 +3,9 @@ import { LayoutBaseDePagina } from '../../shared/layouts';
 import {  FerramentasDeDetalhes } from '../../shared/components';
 import { useEffect, useState } from 'react';
 import { PessoasService } from '../../shared/service/api/pessoas/PessoasService';
+import { Form } from '@unform/web';
+import { TextField } from '@mui/material';
+import { VTextField } from '../../shared/forms';
 
 
 
@@ -60,11 +63,14 @@ export const DetalheDePessoas: React.FC =() =>{
       aoClicarNovo={() => navigate('/pessoas/detalhe/nova')}
       aoClicarSalvar={handleSave}
       aoClicarVoltar={() => navigate('/pessoas')}
-      aoClicarSalvarFechar={()=> {}}
+      aoClicarSalvarFechar={()=> {console.log;}}
       aoClicarApagar={()=> handleDelete(Number(id))}
     />
     }>  
-      <p>Detalhe de pessoa {id}</p>        
+      <Form onSubmit={console.log}>
+        <VTextField name='nomeCompleto'/>   
+             
+      </Form>    
     </LayoutBaseDePagina> 
     
   );
