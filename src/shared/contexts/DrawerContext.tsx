@@ -14,6 +14,7 @@ interface IDrawerContextData {
 
 const DrawerContext = createContext({} as IDrawerContextData);
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useDrawerContext = () => {
   return useContext(DrawerContext);
 };

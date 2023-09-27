@@ -1,7 +1,7 @@
 
 import { LayoutBaseDePagina } from '../../shared/layouts';
 import { BarraDeFerramentas } from '../../shared/components/barra-de-ferramentas/BarraDeFerramentas';
-import { useSearchParams, Navigate, useNavigate } from 'react-router-dom';
+import { useSearchParams,useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { IListagemPessoa, PessoasService } from '../../shared/service/api/pessoas/PessoasService';
 import { useDebounce } from '../../shared/hooks';
