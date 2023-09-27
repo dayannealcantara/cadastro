@@ -1,22 +1,31 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutBaseDePagina } from '../../shared/layouts';
 import {  FerramentasDeDetalhes } from '../../shared/components';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PessoasService } from '../../shared/service/api/pessoas/PessoasService';
 import { Form } from '@unform/web';
 import { TextField } from '@mui/material';
 import { VTextField } from '../../shared/forms';
+import { FormHandles } from '@unform/core';
 
-
+interface IFormData {
+  email: string
+  cidadeId:string
+  nomeCompleto: string
+}
 
 export const DetalheDePessoas: React.FC =() =>{ 
   const {id = 'nova'} =useParams<'id'>();
   const navigate = useNavigate();
 
+  const formRef = useRef<FormHandles>(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const [nome, setNome] = useState('');
 
-
+  const hadleSave = (dados : IFormData) => {
+    console.log(dados);
+  };
 
   useEffect(() => {
     if(id !== 'nova') {
@@ -37,9 +46,7 @@ export const DetalheDePessoas: React.FC =() =>{
     }
   }, [id]);
 
-  const handleSave = () => {
-    console.log('Save');
-  };
+
   const handleDelete =(id:number) =>{
     if(confirm('Deseja realemente excluir?')) {
       PessoasService.deleteById(id)
@@ -61,15 +68,16 @@ export const DetalheDePessoas: React.FC =() =>{
       btnApagar ={id !== 'nova'}
       btnSalvarFechar    
       aoClicarNovo={() => navigate('/pessoas/detalhe/nova')}
-      aoClicarSalvar={handleSave}
+      aoClicarSalvar={()=> formRef.current?.submitForm()}
       aoClicarVoltar={() => navigate('/pessoas')}
-      aoClicarSalvarFechar={()=> {console.log;}}
+      aoClicarSalvarFechar={()=> formRef.current?.submitForm()}
       aoClicarApagar={()=> handleDelete(Number(id))}
     />
     }>  
-      <Form onSubmit={console.log}>
+      <Form  ref={formRef} onSubmit={hadleSave}>
+        <VTextField name='email'/>   
         <VTextField name='nomeCompleto'/>   
-             
+        <VTextField name='cidadeId'/>                
       </Form>    
     </LayoutBaseDePagina> 
     
