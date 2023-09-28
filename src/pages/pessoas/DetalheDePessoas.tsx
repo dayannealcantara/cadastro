@@ -4,13 +4,13 @@ import {  FerramentasDeDetalhes } from '../../shared/components';
 import { useEffect, useRef, useState } from 'react';
 import { PessoasService } from '../../shared/service/api/pessoas/PessoasService';
 import { Form } from '@unform/web';
-import { TextField } from '@mui/material';
 import { VTextField } from '../../shared/forms';
 import { FormHandles } from '@unform/core';
+import { Box, Grid, LinearProgress, Paper, Typography } from '@mui/material';
 
 interface IFormData {
   email: string
-  cidadeId:string
+  cidadeId:number
   nomeCompleto: string
 }
 
@@ -24,7 +24,28 @@ export const DetalheDePessoas: React.FC =() =>{
   const [nome, setNome] = useState('');
 
   const hadleSave = (dados : IFormData) => {
-    console.log(dados);
+    setIsLoading(true);
+    if(id=== 'nova') {
+      PessoasService
+        .create(dados)
+        .then((result) => {
+          setIsLoading(false);
+          if(result instanceof Error) {
+            alert(result.message);
+          }else {
+            navigate(`/pessoas/detalhe/${result}`);
+          }
+        });
+    } else {
+      PessoasService
+        .updateById(Number(id), {id: Number(id), ...dados})
+        .then((result) => {
+          setIsLoading(false);
+          if(result instanceof Error) {
+            alert(result.message);
+          }
+        });
+    }
   };
 
   useEffect(() => {
@@ -39,10 +60,9 @@ export const DetalheDePessoas: React.FC =() =>{
             navigate('/pessoas');
           } else {
             setNome(result.nomeCompleto);
-            console.log(result);
+            formRef.current?.setData(result);
           }
-        }
-        );
+        });
     }
   }, [id]);
 
@@ -75,9 +95,45 @@ export const DetalheDePessoas: React.FC =() =>{
     />
     }>  
       <Form  ref={formRef} onSubmit={hadleSave}>
-        <VTextField name='email'/>   
-        <VTextField name='nomeCompleto'/>   
-        <VTextField name='cidadeId'/>                
+        <Box display="flex" flexDirection="column" margin={1} component={Paper} variant='outlined'>  
+          <Grid container direction="column" padding={2} spacing={2} >
+            <Grid item direction="row" margin={1}> 
+              <Typography variant='h5'> Cadastro geral</Typography>
+            </Grid>   
+            {(isLoading && 
+              <Grid item > 
+                <LinearProgress variant='indeterminate'/>
+              </Grid>  
+            )}       
+            <Grid container item direction="row" spacing={2}>
+              <Grid item xs={12} sm={12} md={6}>
+                <VTextField 
+                  fullWidth 
+                  label='Nome Completo'
+                  name='nomeCompleto'
+                  onChange={e => setNome(e.target.value)}
+                />   
+              </Grid>
+              <Grid container item direction="row" spacing={2}>
+                <Grid item xs={12} sm={12} md={6}>              
+                  <VTextField  
+                    label='Email'
+                    fullWidth 
+                    name='email'                   
+                  />   
+                </Grid>
+              </Grid>
+              <Grid container item direction="row"spacing={2}>
+                <Grid item xs={12} sm={12} md={6}> 
+                  <VTextField 
+                    fullWidth 
+                    label="Cidade"
+                    name='cidadeId'/>             
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Box>                  
       </Form>    
     </LayoutBaseDePagina> 
     
