@@ -1,12 +1,13 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { LayoutBaseDePagina } from '../../shared/layouts';
-import {  FerramentasDeDetalhes } from '../../shared/components';
-import { useEffect, useRef, useState } from 'react';
-import { PessoasService } from '../../shared/service/api/pessoas/PessoasService';
-import { Form } from '@unform/web';
-import { VTextField } from '../../shared/forms';
-import { FormHandles } from '@unform/core';
+import { useEffect, useState } from 'react';
 import { Box, Grid, LinearProgress, Paper, Typography } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+
+import { PessoasService } from '../../shared/service/api/pessoas/PessoasService';
+import { VTextField, VForm, useVForm } from '../../shared/forms';
+import {  FerramentasDeDetalhes } from '../../shared/components';
+import { LayoutBaseDePagina } from '../../shared/layouts';
+
+
 
 interface IFormData {
   email: string
@@ -18,22 +19,28 @@ export const DetalheDePessoas: React.FC =() =>{
   const {id = 'nova'} =useParams<'id'>();
   const navigate = useNavigate();
 
-  const formRef = useRef<FormHandles>(null);
+  const { formRef, save, saveAndClose, isSaveAndClose } = useVForm();
 
   const [isLoading, setIsLoading] = useState(false);
   const [nome, setNome] = useState('');
 
   const hadleSave = (dados : IFormData) => {
     setIsLoading(true);
+
     if(id=== 'nova') {
       PessoasService
         .create(dados)
         .then((result) => {
           setIsLoading(false);
+
           if(result instanceof Error) {
             alert(result.message);
           }else {
-            navigate(`/pessoas/detalhe/${result}`);
+            if (isSaveAndClose()) {
+              navigate('/pessoas');
+            } else {
+              navigate(`/pessoas/detalhe/${result}`);
+            }
           }
         });
     } else {
@@ -43,6 +50,24 @@ export const DetalheDePessoas: React.FC =() =>{
           setIsLoading(false);
           if(result instanceof Error) {
             alert(result.message);
+          } else {
+            if (isSaveAndClose()) {
+              navigate('/pessoas');
+            }
+          }
+        });
+    }
+  };
+
+  const handleDelete =(id:number) =>{
+    if(confirm('Deseja realemente excluir?')) {
+      PessoasService.deleteById(id)
+        .then(result => {
+          if(result instanceof Error){
+            alert(result.message);
+          } else {          
+            alert('Registro deletado com sucesso');
+            navigate('/pessoas');
           }
         });
     }
@@ -63,38 +88,30 @@ export const DetalheDePessoas: React.FC =() =>{
             formRef.current?.setData(result);
           }
         });
+    }else {
+      formRef.current?.setData({
+        email: '',
+        cidadeId: '',
+        nomeCompleto: '',
+      });
     }
-  }, [id]);
-
-
-  const handleDelete =(id:number) =>{
-    if(confirm('Deseja realemente excluir?')) {
-      PessoasService.deleteById(id)
-        .then(result => {
-          if(result instanceof Error){
-            alert(result.message);
-          } else {          
-            alert('Registro deletado com sucesso');
-            navigate('/pessoas');
-          }
-        });
-    }
-  };
+  }, [id]); 
   
   return(
     <LayoutBaseDePagina titulo={id === 'nova' ? 'Nova pessoa' : nome }barraDeFerramentas={<FerramentasDeDetalhes  
       textoBtn='Nova' 
       btnNovo = {id !== 'nova'}
       btnApagar ={id !== 'nova'}
-      btnSalvarFechar    
+      btnSalvarFechar   
+
       aoClicarNovo={() => navigate('/pessoas/detalhe/nova')}
-      aoClicarSalvar={()=> formRef.current?.submitForm()}
+      aoClicarSalvar={save}
       aoClicarVoltar={() => navigate('/pessoas')}
-      aoClicarSalvarFechar={()=> formRef.current?.submitForm()}
+      aoClicarSalvarFechar={saveAndClose}
       aoClicarApagar={()=> handleDelete(Number(id))}
     />
     }>  
-      <Form  ref={formRef} onSubmit={hadleSave}>
+      <VForm  ref={formRef} onSubmit={hadleSave}>
         <Box display="flex" flexDirection="column" margin={1} component={Paper} variant='outlined'>  
           <Grid container direction="column" padding={2} spacing={2} >
             <Grid item direction="row" margin={1}> 
@@ -134,7 +151,7 @@ export const DetalheDePessoas: React.FC =() =>{
             </Grid>
           </Grid>
         </Box>                  
-      </Form>    
+      </VForm>    
     </LayoutBaseDePagina> 
     
   );
