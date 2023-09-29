@@ -3,84 +3,43 @@ import { Box, Grid, LinearProgress, Paper, Typography } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { PessoasService } from '../../shared/service/api/pessoas/PessoasService';
-import { VTextField, VForm, useVForm } from '../../shared/forms';
+import { VTextField, VForm, useVForm, IVFormErrors } from '../../shared/forms';
 import {  FerramentasDeDetalhes } from '../../shared/components';
 import { LayoutBaseDePagina } from '../../shared/layouts';
-
-
+import * as yup from 'yup';
 
 interface IFormData {
-  email: string
-  cidadeId:number
-  nomeCompleto: string
+  email: string;
+  cidadeId: number;
+  nomeCompleto: string;
 }
 
-export const DetalheDePessoas: React.FC =() =>{ 
+const formValidationSchema: yup.SchemaOf<IFormData> = yup.object().shape({
+  cidadeId: yup.number().required(),
+  email: yup.string().required().email(),
+  nomeCompleto: yup.string().required().min(3),
+});
+
+export const DetalheDePessoas: React.FC =() =>{
+  const { formRef, save, saveAndClose, isSaveAndClose } = useVForm();
   const {id = 'nova'} =useParams<'id'>();
   const navigate = useNavigate();
 
-  const { formRef, save, saveAndClose, isSaveAndClose } = useVForm();
 
   const [isLoading, setIsLoading] = useState(false);
   const [nome, setNome] = useState('');
 
-  const hadleSave = (dados : IFormData) => {
-    setIsLoading(true);
 
-    if(id=== 'nova') {
-      PessoasService
-        .create(dados)
-        .then((result) => {
-          setIsLoading(false);
-
-          if(result instanceof Error) {
-            alert(result.message);
-          }else {
-            if (isSaveAndClose()) {
-              navigate('/pessoas');
-            } else {
-              navigate(`/pessoas/detalhe/${result}`);
-            }
-          }
-        });
-    } else {
-      PessoasService
-        .updateById(Number(id), {id: Number(id), ...dados})
-        .then((result) => {
-          setIsLoading(false);
-          if(result instanceof Error) {
-            alert(result.message);
-          } else {
-            if (isSaveAndClose()) {
-              navigate('/pessoas');
-            }
-          }
-        });
-    }
-  };
-
-  const handleDelete =(id:number) =>{
-    if(confirm('Deseja realemente excluir?')) {
-      PessoasService.deleteById(id)
-        .then(result => {
-          if(result instanceof Error){
-            alert(result.message);
-          } else {          
-            alert('Registro deletado com sucesso');
-            navigate('/pessoas');
-          }
-        });
-    }
-  };
 
   useEffect(() => {
-    if(id !== 'nova') {
+    if (id !== 'nova') {
       setIsLoading(true);
+
       PessoasService.getById(Number(id))
         .then((result) => {
           setIsLoading(false);
 
-          if(result instanceof Error) {
+          if (result instanceof Error) {
             alert(result.message);
             navigate('/pessoas');
           } else {
@@ -88,14 +47,82 @@ export const DetalheDePessoas: React.FC =() =>{
             formRef.current?.setData(result);
           }
         });
-    }else {
+    } else {
       formRef.current?.setData({
         email: '',
         cidadeId: '',
         nomeCompleto: '',
       });
     }
-  }, [id]); 
+  }, [id]);
+
+  const handleSave = (dados: IFormData) => {
+    formValidationSchema.
+      validate(dados, { abortEarly: false })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((dadosValidados) => {
+        setIsLoading(true);
+
+        if (id === 'nova') {
+          PessoasService
+            .create(dadosValidados)
+            .then((result) => {
+              setIsLoading(false);
+
+              if (result instanceof Error) {
+                alert(result.message);
+              } else {
+                if (isSaveAndClose()) {
+                  navigate('/pessoas');
+                } else {
+                  navigate(`/pessoas/detalhe/${result}`);
+                }
+              }
+            });
+        } else {
+          PessoasService
+            .updateById(Number(id), { id: Number(id), ...dadosValidados })
+            .then((result) => {
+              setIsLoading(false);
+
+              if (result instanceof Error) {
+                alert(result.message);
+              } else {
+                if (isSaveAndClose()) {
+                  navigate('/pessoas');
+                }
+              }
+            });
+        }
+      })
+      .catch((errors: yup.ValidationError) => {
+        const validationErrors: IVFormErrors = {};
+
+        errors.inner.forEach(error => {
+          if (!error.path) return;
+
+          validationErrors[error.path] = error.message;
+        });
+
+        formRef.current?.setErrors(validationErrors);
+      });
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm('Realmente deseja apagar?')) {
+      PessoasService.deleteById(id)
+        .then(result => {
+          if (result instanceof Error) {
+            alert(result.message);
+          } else {
+            alert('Registro apagado com sucesso!');
+            navigate('/pessoas');
+          }
+        });
+    }
+  };
+  
+ 
   
   return(
     <LayoutBaseDePagina titulo={id === 'nova' ? 'Nova pessoa' : nome }barraDeFerramentas={<FerramentasDeDetalhes  
@@ -111,7 +138,7 @@ export const DetalheDePessoas: React.FC =() =>{
       aoClicarApagar={()=> handleDelete(Number(id))}
     />
     }>  
-      <VForm  ref={formRef} onSubmit={hadleSave}>
+      <VForm  ref={formRef} onSubmit={handleSave}>
         <Box display="flex" flexDirection="column" margin={1} component={Paper} variant='outlined'>  
           <Grid container direction="column" padding={2} spacing={2} >
             <Grid item direction="row" margin={1}> 
