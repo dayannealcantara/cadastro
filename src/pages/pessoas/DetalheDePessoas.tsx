@@ -7,6 +7,7 @@ import { VTextField, VForm, useVForm, IVFormErrors } from '../../shared/forms';
 import {  FerramentasDeDetalhes } from '../../shared/components';
 import { LayoutBaseDePagina } from '../../shared/layouts';
 import * as yup from 'yup';
+import { AutoCompleteCidade } from './components/AutoCompleteCidades';
 
 interface IFormData {
   email: string;
@@ -59,8 +60,8 @@ export const DetalheDePessoas: React.FC =() =>{
   const handleSave = (dados: IFormData) => {
     formValidationSchema.
       validate(dados, { abortEarly: false })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((dadosValidados) => {
+     
+      .then((dadosValidados: any) => {
         setIsLoading(true);
 
         if (id === 'nova') {
@@ -151,28 +152,27 @@ export const DetalheDePessoas: React.FC =() =>{
             )}       
             <Grid container item direction="row" spacing={2}>
               <Grid item xs={12} sm={12} md={6}>
-                <VTextField 
-                  fullWidth 
-                  label='Nome Completo'
+                <VTextField
+                  fullWidth
                   name='nomeCompleto'
+                  disabled={isLoading}
+                  label='Nome completo'
                   onChange={e => setNome(e.target.value)}
-                />   
+                />
               </Grid>
               <Grid container item direction="row" spacing={2}>
                 <Grid item xs={12} sm={12} md={6}>              
-                  <VTextField  
+                  <VTextField
+                    fullWidth
+                    name='email'
                     label='Email'
-                    fullWidth 
-                    name='email'                   
-                  />   
+                    disabled={isLoading}
+                  />
                 </Grid>
               </Grid>
               <Grid container item direction="row"spacing={2}>
                 <Grid item xs={12} sm={12} md={6}> 
-                  <VTextField 
-                    fullWidth 
-                    label="Cidade"
-                    name='cidadeId'/>             
+                  <AutoCompleteCidade isExternalLoading={isLoading} />           
                 </Grid>
               </Grid>
             </Grid>
