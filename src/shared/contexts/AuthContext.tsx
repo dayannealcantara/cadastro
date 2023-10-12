@@ -1,4 +1,5 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { AuthService } from '../service/api/auth/AuthService';
 
 
@@ -55,3 +56,5 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
+export const useAuthContext = () => useContext(AuthContext);
