@@ -2,7 +2,8 @@
 import { Avatar, Divider, Drawer,  Icon,  List, ListItemButton, ListItemIcon, ListItemText, useMediaQuery, useTheme } from '@mui/material';
 import { Box } from '@mui/system';
 import { useAppThemeContext, useDrawerContext } from '../../contexts';
-import { ListItemLink } from './ListMenu';
+
+import { useAuthContext } from '../../contexts/AuthContext';
 
 interface MenuLateralProps {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ export const MenuLateral: React.FC<MenuLateralProps> = ({ children }) => {
   const smDown = useMediaQuery(theme.breakpoints.down('sm'));
   const { isDrawerOpen, drawerOptions, toggleDrawerOpen } = useDrawerContext();
   const {toggleTheme} = useAppThemeContext();
+  const { logout } = useAuthContext();
 
   return (
     <>
@@ -28,26 +30,21 @@ export const MenuLateral: React.FC<MenuLateralProps> = ({ children }) => {
 
           <Divider />
 
-          <Box flex={1} >         
-            <List component="nav">            
-              {drawerOptions.map(drawerOption => (
-                <ListItemLink
-                  to={drawerOption.path}
-                  key={drawerOption.path}
-                  icon={drawerOption.icon}
-                  label={drawerOption.label}
-                  onClick={smDown ? toggleDrawerOpen : undefined}
-                />
-              ))}    
-            </List>
-          </Box>
           <Box>
-            <ListItemButton onClick={toggleTheme}>
-              <ListItemIcon>
-                <Icon>dark_mode</Icon>
-              </ListItemIcon>
-              <ListItemText>Alternar tema</ListItemText>
-            </ListItemButton>      
+            <List component="nav">
+              <ListItemButton onClick={toggleTheme}>
+                <ListItemIcon>
+                  <Icon>dark_mode</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Alternar tema" />
+              </ListItemButton>
+              <ListItemButton onClick={logout}>
+                <ListItemIcon>
+                  <Icon>logout</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Sair" />
+              </ListItemButton>
+            </List>
           </Box>
         </Box>
       </Drawer>
